@@ -54,12 +54,33 @@ class Camera {
 
   static async getCameras() {
     await this._ensureAccess();
-
-    let devices = await navigator.mediaDevices.enumerateDevices();
-    return devices
-      .filter(d => d.kind === 'videoinput')
-      .map(d => new Camera(d.deviceId, cameraName(d.label)));
+    // try for most browsers
+    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+      let devices = await navigator.mediaDevices.enumerateDevices();
+      return devices
+        .filter(d => d.kind === 'videoinput')
+        .map(d => new Camera(d.deviceId, cameraName(d.label)));
+    } else if (typeof MediaStreamTrack === 'undefined' ||
+      typeof MediaStreamTrack.getSources === 'undefined') {
+      // try to get camera sources for android chrome and samsung internet
+      // https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamTrack
+      return new Promise((resolve, reject) => {
+        let devices = [];
+        MediaStreamTrack.getSources((sourceInfos) => {
+          for (var i = 0; i !== sourceInfos.length; ++i) {
+            var sourceInfo = sourceInfos[i];
+            if (sourceInfo.kind === 'video') {
+              devices.push(new Camera(sourceInfo.id, ''));
+            }
+          }
+          resolve(devices);
+        });
+      })
+    } else {
+      return new Error('enumerateDevices() and  MediaStreamTrack.getSources() not supported');
+    }
   }
+
 
   static async _ensureAccess() {
     return await this._wrapErrors(async () => {
