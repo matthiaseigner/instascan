@@ -21,13 +21,15 @@ class Camera {
     let constraints = {
       audio: false,
       video: {
-        mandatory: {
-          sourceId: this.id,
-          minWidth: 600,
-          maxWidth: 800,
-          minAspectRatio: 1.6
-        },
-        optional: []
+        deviceId: { exact: this.id },
+        // mandatory does not work on ios
+        // mandatory: {
+        //   sourceId: this.id,
+        //   minWidth: 600,
+        //   maxWidth: 800,
+        //   minAspectRatio: 1.6
+        // },
+        // optional: []
       }
     };
 

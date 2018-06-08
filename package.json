@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx gulp build",
-    "release": "npx gulp release"
+    "release": "npx gulp release",
+    "wt": "npm run build && cp ./dist/instascan.js /Users/matthias/Documents/Waytation/git/via/via-appia/journey/stack/node/templates/instascan.txt"
   },
   "files": [
     "src/",
